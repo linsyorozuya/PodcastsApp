@@ -107,7 +107,7 @@ class PlayerDetailsView: UIView {
     }
   }
   
-  fileprivate func setupRemoteControl() {
+  func setupRemoteControl() {
     UIApplication.shared.beginReceivingRemoteControlEvents()
     
     let commandCenter = MPRemoteCommandCenter.shared()
@@ -143,13 +143,13 @@ class PlayerDetailsView: UIView {
   
   var playListEpisodes = [Episode]()
   
-  @objc fileprivate func handlePrevTrack() {
-    if playListEpisodes.count == 0 {return}
+  @objc fileprivate func handlePrevTrack()-> MPRemoteCommandHandlerStatus {
+    if playListEpisodes.count == 0 {return .commandFailed}
     let currentEpisodeIndex = playListEpisodes.index { (ep) -> Bool in
       return self.episode.title == ep.title && self.episode.author == ep.author
     }
     
-    guard let index = currentEpisodeIndex else {return}
+    guard let index = currentEpisodeIndex else {return .commandFailed}
     
     let prevEpisode: Episode
     
@@ -160,15 +160,16 @@ class PlayerDetailsView: UIView {
     }
     
     self.episode = prevEpisode
+    return .success
   }
   
-  @objc fileprivate func handleNextTrack() {
-    if playListEpisodes.count == 0 {return}
+  @objc fileprivate func handleNextTrack() -> MPRemoteCommandHandlerStatus {
+    if playListEpisodes.count == 0 {return .commandFailed}
     let currentEpisodeIndex = playListEpisodes.index { (ep) -> Bool in
       return self.episode.title == ep.title && self.episode.author == ep.author
     }
     
-    guard let index = currentEpisodeIndex else {return}
+    guard let index = currentEpisodeIndex else {return .commandFailed}
     
     let nextEpisode: Episode
     
@@ -179,6 +180,7 @@ class PlayerDetailsView: UIView {
     }
     
     self.episode = nextEpisode
+    return .success
   }
   
   fileprivate func setupElapsedTime(playBackRate: Float) {
@@ -225,7 +227,7 @@ class PlayerDetailsView: UIView {
   
   override func awakeFromNib() {
     super.awakeFromNib()
-    setupRemoteControl()
+//    setupRemoteControl()
     setupGestures()
     setupInterruptionObserver()
     observePlayerCurrentTime()
